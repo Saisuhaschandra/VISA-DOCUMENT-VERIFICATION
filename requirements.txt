@@ -1,0 +1,14 @@
+flask
+opencv-python
+numpy
+pillow
+pdf2image
+easyocr
+deepface
+tensorflow
+tf-keras
+scipy
+matplotlib
+torch
+torchvision
+torchaudio
