@@ -1,5 +1,6 @@
 import os
 import cv2
+import platform
 import numpy as np
 from PIL import Image
 from pdf2image import convert_from_path
@@ -7,8 +8,11 @@ from pdf2image import convert_from_path
 UPLOAD_FOLDER = "uploads"
 PROCESSED_FOLDER = "processed"
 
-POPPLER_PATH = r"C:\Users\Admin\Downloads\poppler-25.12.0\Library\bin"
 
+if platform.system() == "Windows":
+    POPPLER_PATH = r"C:\Users\Admin\Downloads\poppler-25.12.0\Library\bin"
+else:
+    POPPLER_PATH = None
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 
 
@@ -65,8 +69,7 @@ def process_file(file_path):
             pages = convert_from_path(
                 file_path,
                 dpi=150,
-                
-                poppler_path=POPPLER_PATH
+                poppler_path=POPPLER_PATH if POPPLER_PATH else None
             )
 
             saved_paths = []
