@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
+from deepface import DeepFace
 
+
+#  FACE PREPROCESS 
 def preprocess_face(image_path):
     img = cv2.imread(image_path)
 
@@ -16,7 +19,7 @@ def preprocess_face(image_path):
     faces = face_cascade.detectMultiScale(gray, 1.2, 5)
 
     if len(faces) == 0:
-        print("No face detected:", image_path)
+        print("❌ No face detected:", image_path)
         return None
 
     x, y, w, h = faces[0]
@@ -29,15 +32,15 @@ def preprocess_face(image_path):
     h = h + 2 * margin
 
     face = gray[y:y+h, x:x+w]
-
     face = cv2.resize(face, (200, 200))
 
     return face
 
 
+#  HISTOGRAM COMPARISON (Fallback) 
 def compare_histogram(face1, face2):
-    hist1 = cv2.calcHist([face1], [0], None, [256], [0,256])
-    hist2 = cv2.calcHist([face2], [0], None, [256], [0,256])
+    hist1 = cv2.calcHist([face1], [0], None, [256], [0, 256])
+    hist2 = cv2.calcHist([face2], [0], None, [256], [0, 256])
 
     hist1 = cv2.normalize(hist1, hist1).flatten()
     hist2 = cv2.normalize(hist2, hist2).flatten()
@@ -46,31 +49,52 @@ def compare_histogram(face1, face2):
     return score
 
 
-from deepface import DeepFace
-
+#  MAIN FACE MATCH 
 def match_faces(img1_path, img2_path):
 
+    print("\n🔍 Comparing Faces")
+    print("Image1:", img1_path)
+    print("Image2:", img2_path)
+
+    #  TRY DEEPFACE 
     try:
         result = DeepFace.verify(
             img1_path,
             img2_path,
-            model_name="SFace",   # 🔥 your model
+            model_name="SFace",
             enforce_detection=False
         )
 
-        print("\nDeepFace Comparison")
-        print("Image1:", img1_path)
-        print("Image2:", img2_path)
-        print("Match:", result["verified"])
-        print("Distance:", result["distance"])
+        verified = result.get("verified", False)
+        distance = result.get("distance", None)
 
-        return result["verified"]
+        print("DeepFace Match:", verified)
+        print("Distance:", distance)
+
+        return verified
 
     except Exception as e:
-        print("DeepFace Error:", str(e))
+        print("⚠️ DeepFace Failed:", str(e))
+
+    #  FALLBACK: OPENCV 
+    print("🔁 Using OpenCV fallback...")
+
+    face1 = preprocess_face(img1_path)
+    face2 = preprocess_face(img2_path)
+
+    if face1 is None or face2 is None:
+        print("❌ Face not detected in one of the images")
         return False
 
-# ---------- FACE DETECTION ----------
+    score = compare_histogram(face1, face2)
+
+    print("Histogram Score:", score)
+
+    # Threshold tuning
+    return score > 0.6
+
+
+#  FACE DETECTION 
 def has_face(image_path):
     img = cv2.imread(image_path)
 
