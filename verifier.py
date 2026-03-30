@@ -1,240 +1,126 @@
-import os
 import re
-import json
-from mrz_parser import extract_mrz, parse_mrz
-from difflib import SequenceMatcher
-
-TEXT_FOLDER = "extracted_text"
-DEBUG_FILE = "debug_comparison.json"
+from deepface import DeepFace
+from doc_classifier import *
+from mrz_parser import extract_mrz, extract_name_from_mrz, extract_name_from_text, choose_best_name
 
 
-def normalize(text):
-    return re.sub(r'[^A-Z]', '', text.upper()) if text else ""
+#  NAME MATCH 
+def name_present(name, text):
 
-
-# ✅ FIXED MRZ NAME EXTRACTION (REMOVE COUNTRY CODE ONLY)
-def extract_name_from_mrz(line1):
-
-    if not line1:
-        return None
-
-    line1 = line1.upper()
-    line1 = re.sub(r'\s+', '', line1)
-
-    if not line1.startswith("P<"):
-        return None
-
-    try:
-        # Remove "P<"
-        line1 = line1[2:]
-
-        # Remove country code (first 3 chars)
-        country_code = line1[:3]
-        name_part = line1[3:]
-
-        parts = name_part.split("<<")
-
-        if len(parts) < 2:
-            return None
-
-        surname = parts[0].replace("<", "")
-        given = parts[1].replace("<", " ").strip()
-
-        full_name = surname + " " + given
-
-        print("MRZ COUNTRY CODE:", country_code)
-        print("EXTRACTED NAME:", full_name)
-
-        return full_name.strip()
-
-    except Exception as e:
-        print("MRZ ERROR:", e)
-        return None
-
-
-def extract_name_from_text(text):
-    text = text.upper()
-    lines = text.split("\n")
-
-    candidates = []
-
-    for line in lines:
-        clean = re.sub(r'[^A-Z ]', '', line).strip()
-
-        if len(clean) < 5:
-            continue
-
-        words = clean.split()
-
-        if any(word in clean for word in [
-            "VISA", "TYPE", "CLASS", "DATE", "BIRTH",
-            "PASSPORT", "NUMBER", "NATIONALITY",
-            "INDIA", "GOVERNMENT"
-        ]):
-            continue
-
-        if 2 <= len(words) <= 4:
-            candidates.append(clean)
-
-    return max(candidates, key=len) if candidates else None
-
-
-def name_match(n1, n2):
-
-    if not n1 or not n2:
+    if not name or not text:
         return False
 
-    def clean(text):
-        text = text.upper()
-        text = text.replace("0", "O")
-        text = text.replace("1", "I")
-        text = re.sub(r'[^A-Z ]', '', text)
-        return text
+    name_words = name.upper().split()
+    text_words = set(text.upper().split())
 
-    n1 = clean(n1)
-    n2 = clean(n2)
+    common = [w for w in name_words if w in text_words]
 
-    words1 = set(n1.split())
-    words2 = set(n2.split())
+    match_ratio = len(common) / len(name_words)
 
-    common = words1.intersection(words2)
+   # print("\n--- NAME CHECK ---")
+    #print("NAME:", name_words)
+    #print("COMMON:", common)
+    #print("MATCH RATIO:", match_ratio)
 
-    print("NAME1:", words1)
-    print("NAME2:", words2)
-    print("COMMON:", common)
-
-    return len(common) >= 2
+    #  FLEXIBLE THRESHOLD 
+    if len(name_words) >= 3:
+        return match_ratio >= 0.6   # 60% match
+    else:
+        return match_ratio >= 0.5
 
 
-def name_present(name, text):
-    return normalize(name) in normalize(text)
+#  FACE MATCH 
+def verify_faces(passport_img, visa_img, photo_img):
+
+    try:
+        # passport vs visa
+        r1 = DeepFace.verify(
+            img1_path=passport_img,
+            img2_path=visa_img,
+            model_name="SFace",
+            enforce_detection=True
+        )
+
+        # passport vs photo
+        r2 = DeepFace.verify(
+            img1_path=passport_img,
+            img2_path=photo_img,
+            model_name="SFace",
+            enforce_detection=True
+        )
+
+        print("\nFace Results:")
+        print("Passport vs Visa:", r1["verified"], r1["distance"])
+        print("Passport vs Photo:", r2["verified"], r2["distance"])
+
+        return r1["verified"] and r2["verified"]
+
+    except Exception as e:
+        print("Face error:", e)
+        return False
 
 
-def extract_dob(text):
-    match = re.search(r'\d{2}[/-]\d{2}[/-]\d{4}', text)
-    return match.group() if match else None
+#  MAIN VERIFY 
+def verify_documents(uploaded_images, texts):
 
-
-def verify_documents():
-
-    texts = {}
-
-    files = [f for f in os.listdir(TEXT_FOLDER) if f.endswith(".txt")]
-
-    if not files:
+    if not texts:
         return "❌ No documents uploaded"
 
-    for file in files:
-        doc_name = file.replace(".txt", "")
-        with open(os.path.join(TEXT_FOLDER, file), "r", encoding="utf-8") as f:
-            texts[doc_name] = f.read()
+    #  CLASSIFICATION 
+    for doc_name, text in texts.items():
 
+        func_name = f"is_{doc_name}"
+
+        if func_name in globals():
+            is_valid = globals()[func_name](text)
+        else:
+            is_valid = False
+
+        # skip photo (no OCR)
+        if doc_name != "photo" and not is_valid:
+            return f"❌ Invalid {doc_name}"
+
+    #  PASSPORT NAME 
     passport_text = texts.get("passport")
-    visa_text = texts.get("visa")
 
     if not passport_text:
-        return "❌ Passport missing"
-
-    if not visa_text:
-        return "❌ Visa missing"
+        return "❌ Passport required"
 
     p1, p2 = extract_mrz(passport_text)
-    v1, v2 = extract_mrz(visa_text)
 
-    if p1 and p2 and v1 and v2:
+    mrz_name = extract_name_from_mrz(p1)
+    text_name = extract_name_from_text(passport_text)
 
-        def clean_mrz(text):
-            text = text.upper().replace(" ", "")
-            text = text.replace("O", "0").replace("I", "1")
-            return text
+    passport_name = choose_best_name(mrz_name, text_name)
 
-        p_name = extract_name_from_mrz(p1)
-        v_name = extract_name_from_mrz(v1)
+    print("\nFINAL PASSPORT NAME:", passport_name)
 
-        if not p_name:
-            p_name = extract_name_from_text(passport_text)
+    #  NAME CHECK 
+    for doc_name, text in texts.items():
 
-        if not v_name:
-            v_name = extract_name_from_text(visa_text)
-
-        if not name_match(p_name, v_name):
-            return "❌ Name mismatch (passport vs visa)"
-
-        p_mrz = clean_mrz(p1 + p2)
-        v_mrz = clean_mrz(v1 + v2)
-
-        score = SequenceMatcher(None, p_mrz, v_mrz).ratio()
-
-        print("MRZ similarity:", score)
-
-        if score < 0.75:
-            return "❌ MRZ mismatch (passport vs visa)"
-
-        base_name = p_name
-
-    else:
-        p_name = extract_name_from_text(passport_text)
-        v_name = extract_name_from_text(visa_text)
-
-        if not p_name or not v_name:
-            return "❌ Could not extract names"
-
-        if not name_match(p_name, v_name):
-            return "❌ Passport & Visa name mismatch"
-
-        base_name = p_name
-
-    for doc, text in texts.items():
-
-        if doc in ["passport", "visa"]:
+        if doc_name in ["passport", "photo"]:
             continue
 
-        if not text or len(text) < 20:
-            return f"❌ {doc} is invalid"
+        if not name_present(passport_name, text):
+            return f"❌ Name mismatch in {doc_name}"
 
-        # ---------- FULL NAME FIRST ----------
-        name_words = normalize(base_name).split()
-        text_clean = normalize(text)
+    #  FACE MATCH 
+    passport_img = uploaded_images.get("passport")
+    visa_img = uploaded_images.get("visa")
+    photo_img = uploaded_images.get("photo")
 
-        full_match = all(word in text_clean for word in name_words)
+    print("\n--- FACE DEBUG ---")
+    print("passport:", passport_img)
+    print("visa:", visa_img)
+    print("photo:", photo_img)
 
-        # ---------- PARTIAL FALLBACK ----------
-        if not full_match:
-            text_words = set(text_clean.split())
-            common = set(name_words).intersection(text_words)
+    if not passport_img or not visa_img or not photo_img:
+        return "❌ Upload passport, visa, and photo"
 
-            print("FULL MATCH FAILED → PARTIAL CHECK")
-            print("NAME WORDS:", name_words)
-            print("COMMON WORDS:", common)
+    print("\nRunning Face Verification...")
 
-            if len(common) < 2:
-                return f"❌ Name mismatch in {doc}"
+    if not verify_faces(passport_img, visa_img, photo_img):
+        return "❌ Face mismatch"
 
-        if doc == "twelfth":
-            p_dob = extract_dob(passport_text)
-            t_dob = extract_dob(text)
-
-            print("Passport DOB:", p_dob)
-            print("12th DOB:", t_dob)
-
-            # OPTIONAL CHECK ONLY (NO FAILURE)
-            if p_dob and t_dob:
-                if p_dob == t_dob:
-                    print("DOB MATCH ✔")
-                else:
-                    print("DOB MISMATCH (IGNORED)")
-
-        if doc == "sop":
-            if len(text.split()) < 100:
-                return "❌ SOP too short"
-
-        if doc == "bank":
-            if len(text) < 50:
-                return "❌ Invalid bank statement"
-
-    return "✅ Verified"
-
-
-def save_debug(data):
-    with open(DEBUG_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
+    #  Final result
+    return "✅ Valid"
