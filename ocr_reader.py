@@ -1,18 +1,24 @@
 import easyocr
 import os
+import platform
 from pdf2image import convert_from_path
 
-POPPLER_PATH = r"C:\Users\Admin\Downloads\poppler-25.12.0\Library\bin"
+#  POPPLER SETUP 
+if platform.system() == "Windows":
+    POPPLER_PATH = r"C:\Users\Admin\Downloads\poppler-25.12.0\Library\bin"
+else:
+    POPPLER_PATH = None
 
 reader = easyocr.Reader(['en'], gpu=False)
 
 TEXT_FOLDER = "extracted_text"
 os.makedirs(TEXT_FOLDER, exist_ok=True)
 
-
 def pdf_to_images(file_path):
-    return convert_from_path(file_path, poppler_path=POPPLER_PATH)
-
+    if POPPLER_PATH:
+        return convert_from_path(file_path, poppler_path=POPPLER_PATH)
+    else:
+        return convert_from_path(file_path)
 
 def extract_text(file_path, doc_type):
     text = ""
