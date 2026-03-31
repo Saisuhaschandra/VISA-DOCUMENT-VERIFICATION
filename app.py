@@ -1,12 +1,19 @@
-import os
-import time
 
-# Disable MKLDNN issues for cmd 
+import os
+
+#  SUPPRESS WARNINGS 
+#os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+#os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
+# Optional (your existing ones)
 #os.environ["FLAGS_use_mkldnn"] = "0"
 #os.environ["FLAGS_enable_pir_api"] = "0"
 
-from flask import Flask, request, render_template, jsonify
+#import suppress_warnings  
 
+#  NORMAL IMPORTS 
+import time
+from flask import Flask, request, render_template, jsonify
 from doc_classifier import (
     is_passport, is_visa, is_tenth, is_twelfth,
     is_degree, is_bank, is_sop, is_resume
@@ -157,6 +164,7 @@ def verify():
         "result": result
     })
 
-#  RUN 
+
+# ---------- RUN ----------
 if __name__ == "__main__":
     app.run(debug=True)
