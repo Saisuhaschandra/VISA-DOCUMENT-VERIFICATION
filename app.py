@@ -16,8 +16,9 @@ import time
 from flask import Flask, request, render_template, jsonify
 from doc_classifier import (
     is_passport, is_visa, is_tenth, is_twelfth,
-    is_degree, is_bank, is_sop, is_resume
+    is_degree,is_english_score, is_bank, is_sop, is_resume
 )
+
 
 from verifier import verify_documents
 from preprocess import process_file
