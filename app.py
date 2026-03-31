@@ -123,7 +123,10 @@ def upload():
 
     elif doc_type == "degree":
         valid = is_degree(full_text)
-
+    
+    elif doc_type == "english_score":
+        valid = is_english_score(full_text)
+        
     elif doc_type == "bank":
         valid = is_bank(full_text)
 
