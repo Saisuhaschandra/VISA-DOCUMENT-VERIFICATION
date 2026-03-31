@@ -1,11 +1,11 @@
-// ---------- BASIC SETUP ----------
+//  BASIC SETUP 
 const TOTAL_DOCS = 17;
 
 // store uploaded documents
 const uploadedDocs = new Set();
 
 
-// ---------- UPDATE PROGRESS ----------
+//  UPDATE PROGRESS 
 function updateProgress() {
     const count = uploadedDocs.size;
     const percent = Math.round((count / TOTAL_DOCS) * 100);
@@ -16,7 +16,7 @@ function updateProgress() {
 }
 
 
-// ---------- HANDLE FILE SELECTION ----------
+//  HANDLE FILE SELECTION 
 document.querySelectorAll("input[type='file']").forEach(input => {
 
     input.addEventListener("change", function () {
