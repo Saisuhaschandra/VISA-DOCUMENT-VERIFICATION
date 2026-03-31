@@ -24,6 +24,8 @@ A backend system that verifies user documents using **OCR, MRZ parsing, and face
 * 10th Memo
 * 12th Memo
 * Degree Certificate
+
+  
 more..
 
 ---
