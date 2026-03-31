@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Visa Document Verification</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>Visa Document Verification</h1>
+<div class="progress-circle">
+<span id="progressPercent">0%</span>
+</div>
+</div>
+
+<p id="progressText">0 of 17 documents uploaded</p>
+
+<!-- 1 Passport -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>1. Passport</h3>
+<span class="optional">Optional</span>
+<p>Valid passport for visa processing</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="passport" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('passport')">Upload</button>
+<p id="passport_status"></p>
+</div>
+</div>
+
+<!-- 2 Visa -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>2. Visa</h3>
+<span class="optional">Optional</span>
+<p>Uploaded visa document</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="visa" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('visa')">Upload</button>
+<p id="visa_status"></p>
+</div>
+</div>
+
+<!-- 3 Photo -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>3. Passport Size Photograph</h3>
+<span class="optional">Optional</span>
+<p>Recent passport-size photograph</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="photo" accept=".jpg,.png">
+<button onclick="uploadDoc('photo')">Upload</button>
+<p id="photo_status"></p>
+</div>
+</div>
+
+<!-- 4 10th -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>4. 10th Marksheet</h3>
+<span class="optional">Optional</span>
+<p>Secondary school certificate</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="tenth" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('tenth')">Upload</button>
+<p id="tenth_status"></p>
+</div>
+</div>
+
+<!-- 5 12th -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>5. 12th Marksheet</h3>
+<span class="optional">Optional</span>
+<p>Higher secondary certificate</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="twelfth" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('twelfth')">Upload</button>
+<p id="twelfth_status"></p>
+</div>
+</div>
+
+<!-- 6 Degree -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>6. Degree Certificate</h3>
+<span class="optional">Optional</span>
+<p>University degree certificate</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="degree" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('degree')">Upload</button>
+<p id="degree_status"></p>
+</div>
+</div>
+
+<!-- 7 Bank -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>7. Bank Statement</h3>
+<span class="optional">Optional</span>
+<p>Financial proof</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="bank" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('bank')">Upload</button>
+<p id="bank_status"></p>
+</div>
+</div>
+
+<!-- 8 SOP -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>8. Statement of Purpose</h3>
+<span class="optional">Optional</span>
+<p>Explain purpose</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="sop" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('sop')">Upload</button>
+<p id="sop_status"></p>
+</div>
+</div>
+
+<!-- 9 Resume -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>9. Resume / CV</h3>
+<span class="optional">Optional</span>
+<p>Academic & work history</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="resume" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('resume')">Upload</button>
+<p id="resume_status"></p>
+</div>
+</div>
+
+<!-- 10 ITR -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>10. ITR / Income Proof</h3>
+<span class="optional">Optional</span>
+<p>Income proof</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="itr" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('itr')">Upload</button>
+<p id="itr_status"></p>
+</div>
+</div>
+
+<!-- 11 Employment -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>11. Employment / Business Proof</h3>
+<span class="optional">Optional</span>
+<p>Employment proof</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="employment" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('employment')">Upload</button>
+<p id="employment_status"></p>
+</div>
+</div>
+
+<!-- 12 Offer -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>12. Offer Letter</h3>
+<span class="optional">Optional</span>
+<p>Offer document</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="offer_letter" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('offer_letter')">Upload</button>
+<p id="offer_letter_status"></p>
+</div>
+</div>
+
+<!-- 13 Salary -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>13. Salary Slips</h3>
+<span class="optional">Optional</span>
+<p>Salary proof</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="salary_slip" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('salary_slip')">Upload</button>
+<p id="salary_slip_status"></p>
+</div>
+</div>
+
+<!-- 14 GST -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>14. GST Certificate</h3>
+<span class="optional">Optional</span>
+<p>GST proof</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="gst" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('gst')">Upload</button>
+<p id="gst_status"></p>
+</div>
+</div>
+
+<!-- 15 Flight -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>15. Flight Reservation</h3>
+<span class="optional">Optional</span>
+<p>Flight booking</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="flight" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('flight')">Upload</button>
+<p id="flight_status"></p>
+</div>
+</div>
+
+<!-- 16 Hotel -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>16. Hotel Booking</h3>
+<span class="optional">Optional</span>
+<p>Hotel reservation</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="hotel" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('hotel')">Upload</button>
+<p id="hotel_status"></p>
+</div>
+</div>
+
+<!-- 17 Insurance -->
+<div class="doc-card">
+<div class="doc-info">
+<h3>17. Travel Insurance</h3>
+<span class="optional">Optional</span>
+<p>Travel insurance</p>
+</div>
+<div class="doc-upload">
+<input type="file" id="insurance" accept=".jpg,.png,.pdf">
+<button onclick="uploadDoc('insurance')">Upload</button>
+<p id="insurance_status"></p>
+</div>
+</div>
+
+</div>
+
+<div class="verify-section">
+<button onclick="verifyDocs()">Verify Documents</button>
+<h2 id="finalResult"></h2>
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>

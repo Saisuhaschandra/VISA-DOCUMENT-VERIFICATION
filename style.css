@@ -1,0 +1,129 @@
+body{
+
+font-family:Arial;
+background:#f5f6fa;
+padding:40px;
+
+}
+
+.container{
+
+max-width:900px;
+margin:auto;
+
+}
+
+.header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+}
+
+h1{
+
+color:#3b6edc;
+
+}
+
+.progress-circle{
+
+width:70px;
+height:70px;
+border-radius:50%;
+border:6px solid #dcdcdc;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+
+}
+
+.doc-card{
+
+background:white;
+padding:20px;
+margin-top:15px;
+border-radius:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+
+}
+
+.doc-info{
+
+max-width:60%;
+
+}
+
+.required{
+
+background:#ffdddd;
+color:#b30000;
+padding:3px 8px;
+border-radius:5px;
+font-size:12px;
+margin-left:10px;
+
+}
+
+.optional{
+
+background:#e6f0ff;
+color:#0044cc;
+padding:3px 8px;
+border-radius:5px;
+font-size:12px;
+margin-left:10px;
+
+}
+
+button{
+
+padding:7px 14px;
+background:#3b6edc;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#2a50a3;
+
+}
+
+.doc-upload{
+
+text-align:right;
+
+}
+.verify-section{
+    text-align:center;
+    margin-top:30px;
+}
+
+.verify-section button{
+    padding:12px 25px;
+    font-size:18px;
+    background-color:#007bff;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.verify-section button:hover{
+    background-color:#0056b3;
+}
+
+#finalResult{
+    margin-top:20px;
+    font-size:22px;
+    font-weight:bold;
+}
