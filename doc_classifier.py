@@ -129,7 +129,29 @@ def is_degree(text):
 
     return score >= 3
 
+#  ENGLISH TEST (IELTS / TOEFL / PTE) 
+def is_english_score(text):
 
+    text = text.upper()
+
+    score = 0
+
+    # keywords
+    if "IELTS" in text or "TOEFL" in text or "PTE" in text:
+        score += 2
+
+    if "TEST REPORT" in text or "SCORE REPORT" in text:
+        score += 1
+
+    if "OVERALL" in text or "BAND" in text or "SCORE" in text:
+        score += 1
+
+    # score pattern
+    if re.search(r'\d\.\d', text):   # 7.5, 6.0 etc
+        score += 1
+
+    return score >= 2
+    
 # Check bank statement
 def is_bank(text):
     text = text.upper()
