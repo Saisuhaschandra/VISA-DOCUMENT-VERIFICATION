@@ -131,6 +131,13 @@ def verify_documents(uploaded_images, texts):
     if not texts:
         return "❌ No documents uploaded"
 
+    #  MANDATORY DOCUMENTS 
+    if "passport" not in texts:
+        return "❌ Passport required"
+
+    if "english_score" not in texts:
+        return "❌ IELTS/TOEFL/PTE scorecard required"
+
     #  CLASSIFICATION 
     for doc_name, text in texts.items():
 
@@ -141,14 +148,12 @@ def verify_documents(uploaded_images, texts):
         else:
             is_valid = False
 
+        # skip photo (no OCR validation)
         if doc_name != "photo" and not is_valid:
             return f"❌ Invalid {doc_name}"
 
     #  PASSPORT 
     passport_text = texts.get("passport")
-
-    if not passport_text:
-        return "❌ Passport required"
 
     #  EXPIRY CHECK 
     expiry_date = extract_expiry_date(passport_text)
@@ -191,5 +196,5 @@ def verify_documents(uploaded_images, texts):
     if not verify_faces_dynamic(passport_img, visa_img, photo_img):
         return "❌ Face mismatch"
 
-    # ---------- FINAL ----------
+    #  FINAL 
     return "✅ Valid"
